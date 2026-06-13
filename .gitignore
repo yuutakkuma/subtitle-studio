@@ -1,0 +1,87 @@
+# Dependencies
+node_modules/
+
+# Python environments and caches
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build outputs
+dist/
+dist-electron/
+build/
+release/
+out/
+*.spec
+
+# PyInstaller temporary/runtime files
+*.manifest
+*.toc
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.mobileprovision
+*.provisionprofile
+*.entitlements
+auth.json
+credentials.json
+secrets.json
+token.json
+
+# User media and generated subtitle outputs
+*.wav
+*.mp3
+*.m4a
+*.aac
+*.flac
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.srt
+*.vtt
+output/
+outputs/
+subtitles/
+
+# Whisper/model caches if created inside the repo
+.cache/
+models/
+whisper-cache/
+huggingface/
+.huggingface/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Electron Builder metadata
+builder-debug.yml
+builder-effective-config.yaml
