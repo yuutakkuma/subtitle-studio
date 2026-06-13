@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { app, BrowserWindow, clipboard, dialog, ipcMain } from "electron";
 import type { BrowserWindow as BrowserWindowType } from "electron";
 import { ChildProcess, spawn } from "node:child_process";
 import fs from "node:fs";
@@ -189,6 +189,22 @@ ipcMain.handle("subtitle:stop", async () => {
   };
 });
 
+ipcMain.handle("subtitle:copy-text", async (_event, text: unknown) => {
+  if (typeof text !== "string") {
+    return {
+      success: false,
+      message: "Invalid clipboard text.",
+    };
+  }
+
+  clipboard.writeText(text);
+
+  return {
+    success: true,
+    message: "Copied to clipboard.",
+  };
+});
+
 ipcMain.handle("subtitle:generate", async (_event, unsafeOptions): Promise<GenerateSubtitleResult> => {
   if (isGenerating) {
     return {
@@ -251,6 +267,10 @@ ipcMain.handle("subtitle:generate", async (_event, unsafeOptions): Promise<Gener
 
     const child = spawn(runner.command, args, {
       cwd: runner.cwd,
+      env: {
+        ...process.env,
+        PYTHONUNBUFFERED: "1",
+      },
       shell: false,
       stdio: ["ignore", "pipe", "pipe"],
     });

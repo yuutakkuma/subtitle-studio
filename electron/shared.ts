@@ -32,6 +32,11 @@ export type StopSubtitleResult = {
   message: string;
 };
 
+export type CopyTextResult = {
+  success: boolean;
+  message: string;
+};
+
 export const subtitleModels: SubtitleModel[] = [
   "tiny",
   "base",

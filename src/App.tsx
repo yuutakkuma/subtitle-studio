@@ -1,6 +1,7 @@
 import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircle2,
+  Clipboard,
   FileAudio,
   FolderOpen,
   Loader2,
@@ -51,6 +52,7 @@ function App() {
   const [result, setResult] = useState<GenerateSubtitleResult | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [copyMessage, setCopyMessage] = useState("");
   const logEndRef = useRef<HTMLDivElement | null>(null);
 
   const canGenerate =
@@ -177,6 +179,25 @@ function App() {
     }
   };
 
+  const copyLogs = async () => {
+    if (logs.length === 0) return;
+
+    const text = logs
+      .map((log) => `[${formatTime(log.timestamp)}] ${log.message}`)
+      .join("\n");
+
+    try {
+      const result = await window.subtitle.copyText(text);
+      setCopyMessage(result.success ? "コピーしました" : result.message);
+    } catch (error) {
+      setCopyMessage(error instanceof Error ? error.message : "コピーに失敗しました");
+    }
+
+    window.setTimeout(() => {
+      setCopyMessage("");
+    }, 2000);
+  };
+
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(false);
@@ -191,9 +212,9 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen bg-zinc-100 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
-      <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-8">
-        <header className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-zinc-300 pb-5 dark:border-zinc-800">
+    <main className="h-screen overflow-hidden bg-zinc-100 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-100">
+      <div className="mx-auto flex h-screen min-h-0 w-full max-w-5xl flex-col px-6 py-8">
+        <header className="mb-7 shrink-0 flex flex-wrap items-end justify-between gap-4 border-b border-zinc-300 pb-5 dark:border-zinc-800">
           <div>
             <h1 className="text-3xl font-semibold tracking-normal">Whisper Subtitle</h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -203,8 +224,8 @@ function App() {
           <StatusBadge status={status} />
         </header>
 
-        <section className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.85fr)]">
-          <div className="space-y-5">
+        <section className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,0.85fr)]">
+          <div className="min-h-0 space-y-5 overflow-y-auto pr-1">
             <div
               className={[
                 "rounded border border-dashed p-5 transition",
@@ -320,9 +341,25 @@ function App() {
             )}
           </div>
 
-          <section className="flex min-h-[420px] flex-col rounded border border-zinc-300 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
+          <section className="flex min-h-0 flex-col overflow-hidden rounded border border-zinc-300 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-zinc-300 px-4 py-3 dark:border-zinc-800">
               <h2 className="text-base font-semibold">ログ</h2>
+              <div className="flex items-center gap-2">
+                {copyMessage && (
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {copyMessage}
+                  </span>
+                )}
+                <button
+                  className="flex h-8 items-center gap-2 rounded border border-zinc-300 bg-white px-3 text-xs font-medium transition hover:border-teal-500 hover:text-teal-700 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-950 dark:hover:text-teal-300"
+                  disabled={logs.length === 0}
+                  onClick={copyLogs}
+                  type="button"
+                >
+                  <Clipboard size={14} />
+                  コピー
+                </button>
+              </div>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto p-4 font-mono text-xs leading-5">
               {logs.length === 0 ? (
@@ -482,6 +519,7 @@ function getProgressFromLog(message: string) {
   if (message.includes("Transcribing audio")) return 45;
   if (message.includes("Still running")) return 50;
   if (message.includes("Detected language")) return 80;
+  if (message.includes("Formatting subtitles")) return 90;
   if (message.includes("Generated:")) return 95;
   if (message.includes("Subtitle generated successfully")) return 100;
   return null;

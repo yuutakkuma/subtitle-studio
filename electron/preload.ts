@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer, webUtils } from "electron";
 import {
   GenerateSubtitleOptions,
   GenerateSubtitleResult,
+  CopyTextResult,
   SubtitleLogEvent,
   StopSubtitleResult,
 } from "./shared.js";
@@ -13,6 +14,7 @@ const subtitleApi = {
   generateSubtitle: (options: GenerateSubtitleOptions) =>
     ipcRenderer.invoke("subtitle:generate", options) as Promise<GenerateSubtitleResult>,
   stopSubtitle: () => ipcRenderer.invoke("subtitle:stop") as Promise<StopSubtitleResult>,
+  copyText: (text: string) => ipcRenderer.invoke("subtitle:copy-text", text) as Promise<CopyTextResult>,
   onLog: (callback: (event: SubtitleLogEvent) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, logEvent: SubtitleLogEvent) => {
       callback(logEvent);
