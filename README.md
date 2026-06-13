@@ -309,7 +309,3 @@ deactivate
 ```
 
 ---
-
-## ライセンス
-
-MIT License
