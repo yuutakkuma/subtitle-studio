@@ -1,6 +1,6 @@
 {
-  "name": "whisper-subtitle",
-  "version": "1.0.0",
+  "name": "subtitle-studio",
+  "version": "1.0.2",
   "private": true,
   "description": "Desktop GUI for subtitle.py",
   "main": "dist-electron/main.js",
@@ -14,15 +14,16 @@
     "typecheck": "tsc --noEmit"
   },
   "build": {
-    "appId": "local.whisper-subtitle",
-    "productName": "Whisper Subtitle",
+    "appId": "local.subtitle-studio",
+    "productName": "Subtitle Studio",
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**/*",
       "dist-electron/**/*",
-      "package.json"
+      "package.json",
+      "public/icon.png"
     ],
     "extraResources": [
       {
@@ -31,6 +32,7 @@
       }
     ],
     "mac": {
+      "icon": "public/icon.png",
       "target": [
         "dir"
       ],

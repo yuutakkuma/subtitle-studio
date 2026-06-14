@@ -18,6 +18,7 @@ import {
 const projectRoot = path.resolve(__dirname, "..");
 const isDev = Boolean(process.env.VITE_DEV_SERVER_URL);
 const bundledCliName = process.platform === "win32" ? "subtitle-cli.exe" : "subtitle-cli";
+const appIconPath = path.join(projectRoot, "public", "icon.png");
 
 let mainWindow: BrowserWindowType | null = null;
 let isGenerating = false;
@@ -30,7 +31,8 @@ function createWindow() {
     height: 820,
     minWidth: 760,
     minHeight: 620,
-    title: "Whisper Subtitle",
+    title: "Subtitle Studio",
+    icon: appIconPath,
     backgroundColor: "#0f172a",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
