@@ -1,6 +1,6 @@
 {
   "name": "subtitle-studio",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Desktop GUI for subtitle.py",
   "main": "dist-electron/main.js",

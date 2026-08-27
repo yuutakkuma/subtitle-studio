@@ -19,6 +19,7 @@ import {
   subtitleLanguages,
   subtitleModels,
 } from "../electron/shared";
+import packageJson from "../package.json";
 
 type StoredSettings = {
   model?: SubtitleModel;
@@ -216,7 +217,9 @@ function App() {
       <div className="mx-auto flex h-screen min-h-0 w-full max-w-5xl flex-col px-6 py-8">
         <header className="mb-7 shrink-0 flex flex-wrap items-end justify-between gap-4 border-b border-zinc-300 pb-5 dark:border-zinc-800">
           <div>
-            <h1 className="text-3xl font-semibold tracking-normal">Subtitle Studio</h1>
+            <h1 className="text-3xl font-semibold tracking-normal">
+              Subtitle Studio <span className="text-base font-normal text-zinc-500">v{packageJson.version}</span>
+            </h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
               音声ファイルから SRT / VTT / TXT 字幕を生成します。
             </p>
