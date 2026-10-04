@@ -85,6 +85,9 @@ function validateOptions(value: unknown): GenerateSubtitleOptions {
   if (!isModel(options.model)) throw new Error("Invalid model.");
   if (!isFormat(options.format)) throw new Error("Invalid output format.");
   if (!isLanguage(options.language)) throw new Error("Invalid language.");
+  if (options.wordTimestamps !== undefined && typeof options.wordTimestamps !== "boolean") {
+    throw new Error("Invalid word timestamps option.");
+  }
 
   return {
     input: options.input,
@@ -93,6 +96,7 @@ function validateOptions(value: unknown): GenerateSubtitleOptions {
     model: options.model,
     format: options.format,
     language: options.language,
+    wordTimestamps: options.wordTimestamps ?? false,
   };
 }
 
@@ -244,6 +248,7 @@ ipcMain.handle("subtitle:generate", async (_event, unsafeOptions): Promise<Gener
     options.format,
     "--language",
     options.language,
+    ...(options.wordTimestamps ? ["--word-timestamps"] : []),
   ];
 
   sendLog("info", "Subtitle generation started.");

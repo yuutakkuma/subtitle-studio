@@ -1,6 +1,6 @@
 {
   "name": "subtitle-studio",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "private": true,
   "description": "Desktop GUI for subtitle.py",
   "main": "dist-electron/main.js",
@@ -11,7 +11,8 @@
     "build:electron": "tsc -p tsconfig.electron.json",
     "build:app": "npm run build && npm run build:python && electron-builder --mac dir",
     "preview": "vite preview --host 127.0.0.1",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:electron": "npm run build:electron && node --test tests/*.test.cjs"
   },
   "build": {
     "appId": "local.subtitle-studio",

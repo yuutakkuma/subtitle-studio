@@ -9,6 +9,7 @@ export type GenerateSubtitleOptions = {
   model: SubtitleModel;
   format: SubtitleFormat;
   language: SubtitleLanguage;
+  wordTimestamps: boolean;
 };
 
 export type SubtitleLogLevel = "stdout" | "stderr" | "info" | "error";

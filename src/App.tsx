@@ -26,6 +26,7 @@ type StoredSettings = {
   format?: SubtitleFormat;
   language?: SubtitleLanguage;
   output?: string;
+  wordTimestamps?: boolean;
 };
 
 type Status = "idle" | "running" | "success" | "failed" | "stopped";
@@ -34,7 +35,10 @@ const settingsKey = "whisper-subtitle-settings";
 
 function readStoredSettings(): StoredSettings {
   try {
-    return JSON.parse(localStorage.getItem(settingsKey) ?? "{}") as StoredSettings;
+    const parsed: unknown = JSON.parse(localStorage.getItem(settingsKey) ?? "{}");
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as StoredSettings
+      : {};
   } catch {
     return {};
   }
@@ -48,6 +52,7 @@ function App() {
   const [model, setModel] = useState<SubtitleModel>(stored.model ?? "large-v3");
   const [format, setFormat] = useState<SubtitleFormat>(stored.format ?? "srt");
   const [language, setLanguage] = useState<SubtitleLanguage>(stored.language ?? "ja");
+  const [wordTimestamps, setWordTimestamps] = useState(stored.wordTimestamps === true);
   const [logs, setLogs] = useState<SubtitleLogEvent[]>([]);
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<GenerateSubtitleResult | null>(null);
@@ -92,9 +97,10 @@ function App() {
       format,
       language,
       output,
+      wordTimestamps,
     };
     localStorage.setItem(settingsKey, JSON.stringify(settings));
-  }, [model, format, language, output]);
+  }, [model, format, language, output, wordTimestamps]);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -130,6 +136,7 @@ function App() {
         model,
         format,
         language,
+        wordTimestamps,
       });
 
       setResult(nextResult);
@@ -290,6 +297,23 @@ function App() {
                 options={subtitleLanguages}
                 onChange={(event) => setLanguage(event.target.value as SubtitleLanguage)}
               />
+            </div>
+
+            <div className="rounded border border-zinc-300 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+              <label className="flex items-center gap-3 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-teal-600 disabled:cursor-not-allowed"
+                  checked={wordTimestamps}
+                  onChange={(event) => setWordTimestamps(event.target.checked)}
+                  disabled={status === "running"}
+                  aria-describedby="word-timestamps-description"
+                />
+                単語ごとの時刻を取得する
+              </label>
+              <p id="word-timestamps-description" className="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+                字幕の区切りと本文は、認識結果をそのまま使用します。
+              </p>
             </div>
 
             <div className="space-y-3 rounded border border-zinc-300 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">

@@ -28,6 +28,7 @@ python subtitle.py \
 | `--model` | No | Whisperモデル |
 | `--format` | No | 出力形式 |
 | `--language` | No | 認識言語 |
+| `--word-timestamps` | No | 単語時刻を取得するフラグ。省略時はFalse |
 
 ## --input
 
@@ -150,6 +151,12 @@ ja
 | 中国語 | zh |
 | 韓国語 | ko |
 
+## --word-timestamps
+
+値を伴わない有効化フラグ。指定時は `True`、省略時は `False` を `model.transcribe()` の `word_timestamps` に渡す。`--word-timestamps false` という指定は受け付けない。オフにする場合はフラグを省略する。
+
+GUIの `wordTimestamps` がtrueのときにElectronがこのフラグを追加する。SRT / VTT / TXTのすべてで適用する。
+
 ## 出力
 
 指定された出力ディレクトリに以下の形式でファイルを生成する。
@@ -167,16 +174,14 @@ output/
 
 ## 字幕出力
 
-v1.0.5 の `srt` / `vtt` は共通の字幕分割・時刻生成処理を使う。固定文字数による分割・文字数比例の時刻配分は行わない。
+v1.0.6 の `srt` / `vtt` は `_display_cues()` を共通に使い、1 segmentを1 cueへ変換する。
 
-- `model.transcribe(..., word_timestamps=True)` を全出力形式で使用する。モデル・device・compute_type・CLI引数は変更しない。
-- 分割前の原文を `segment.words` に対応付け、句読点・語間の無音・日本語の表現や語尾を組み合わせて境界を選ぶ。
-- 時刻は字幕内の最初の語の `start` と最後の語の `end` を使う。語の内部に分割点を推測したり、時刻を補間したりしない。
-- 欠損・不正な単語時刻や本文不一致は、そのsegmentを原文・元のsegment時刻のまま1 cueにする。`Subtitle fallback: segment ...: 理由` をstdoutへ出力する。
-- 分割後に表示用句読点を除去し、改行・連続空白を整理する。小数点・時刻のコロン・数値の桁区切り・演算子などは保持する。
+- 本文は `segment.text`、時刻は `segment.start` / `segment.end` を保持する。
+- 独自分割・結合・文字数比例の時刻配分・句読点や空白の加工は行わない。
+- `word_timestamps` は認識時の設定であり、`segment.words` による出力側の再分割は行わない。単語時刻の検証・フォールバック処理もない。
 - SRTは連番とカンマ区切りのミリ秒、VTTは `WEBVTT` ヘッダーとピリオド区切りのミリ秒を出力する。
-- 元のsegment時刻自体が不正・重複してフォールバック不能な場合はエラーとし、出力ファイルを開く前に停止する。
+- 元segmentの時刻を独自補正・検証する処理は設けない。
 
-`txt` は各segmentのテキストを加工せず、その末尾に改行を追加する。認識結果に含まれる句読点・空白・改行は保持する。
+`txt` は各segmentのテキストを加工せず、その末尾に改行を追加する。
 
-分割ルール、閾値、フォールバックの条件と制約は [字幕分割仕様](subtitle-segmentation.md) を参照する。
+詳細は [字幕出力仕様](subtitle-segmentation.md) を参照する。

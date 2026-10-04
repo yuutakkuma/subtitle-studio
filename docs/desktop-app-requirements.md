@@ -80,6 +80,12 @@ srt
 ja
 ```
 
+### 単語タイムスタンプ
+
+- GUIから単語時刻の取得をオン／オフできる。
+- 初回の既定値はFalse。以後は保存した選択を復元する。
+- SRT / VTT / TXTすべてで認識モデルへ設定を渡す。
+
 ### 字幕生成
 
 GUI から `subtitle.py` を実行する。
@@ -104,7 +110,6 @@ python subtitle.py \
 - stderr
 - 終了コード
 - エラー内容
-- 単語時刻の欠損・不正などによる字幕フォールバックの理由
 
 表示例:
 
@@ -139,6 +144,7 @@ Subtitle generation failed.
 - format
 - language
 - output directory
+- wordTimestamps
 
 保存先は初期実装では `localStorage` でよい。
 
@@ -164,8 +170,8 @@ Subtitle generation failed.
 - Python 仮想環境の自動作成
 - faster-whisper の自動インストール
 
-## v1.0.5 の字幕分割
+## v1.0.6 の字幕出力
 
-字幕の自動整形はPython CLIで実施する。固定文字数制限は設けず、単語時刻・句読点・発話の間・日本語のまとまりに基づいてSRT / VTTを生成する。TXTの本文は加工しない。
+認識結果のsegment本文・開始時刻・終了時刻をそのままSRT / VTTへ出力する。Python側の独自分割・結合・表示加工は行わない。TXTの本文も加工しない。
 
-UIの新設・変更、認識モデルの変更、外部APIやLLMによる校正は本バージョンの対象外とする。詳細は [字幕分割仕様](subtitle-segmentation.md) を参照する。
+単語タイムスタンプの設定UIを追加する。認識モデルの変更、外部APIやLLMによる校正は対象外とする。詳細は [字幕出力仕様](subtitle-segmentation.md) を参照する。
