@@ -4,7 +4,7 @@
 
 本アプリは、Electron + React + TypeScript で構築する。
 
-既存の Python CLI `subtitle.py` を変更せず、Electron Main Process から subprocess として起動する。
+Python CLI `subtitle.py` の引数・出力形式との互換性を維持し、Electron Main Process から subprocess として起動する。
 
 ## 全体構成
 
@@ -158,6 +158,20 @@ export type GenerateSubtitleOptions = {
 Python の stdout / stderr を受け取り、Renderer に送信する。
 
 ログは時系列で表示できること。
+
+## v1.0.5 の字幕生成
+
+Python内で以下の順に処理する。Electron / Preload / Renderer の呼び出し構成は変更しない。
+
+1. faster-whisper から `word_timestamps=True` でsegmentと語単位時刻を取得する。
+2. 語時刻の妥当性を検証し、表示加工前の原文上の文字位置に対応付ける。
+3. 日本語の接続表現・連続する文字種・付属語を保護し、句読点と語間の時間差から字幕を分割する。
+4. 弱い区切りを調整して短い断片を減らし、各字幕の先頭語・末尾語の実時刻を採用する。
+5. SRT / VTT の共通経路で表示テキストを整え、形式ごとに書き出す。TXTは元のsegment本文を直接書き出す。
+
+不正な単語時刻や本文不一致はsegment単位でフォールバックし、理由をstdoutへ出すため既存GUIのログ欄でも確認できる。日本語判定はPython標準ライブラリの規則で実装し、追加パッケージ・辞書は同梱しない。既存のPyInstallerエントリーポイントとビルドコマンドを使用する。
+
+原文に対応付けた文字範囲を連続して切り出すため、分割による本文の要約・補完・重複は行わない。詳細は [字幕分割仕様](subtitle-segmentation.md) を参照する。
 
 ## 終了コード
 
